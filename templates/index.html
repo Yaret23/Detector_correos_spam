@@ -1,0 +1,1450 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecureShield AI - Sistema de Detección</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #000000;
+            color: #e4e4e7;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.1) 0%, rgba(236, 72, 153, 0.1) 100%);
+            border-bottom: 1px solid rgba(168, 85, 247, 0.2);
+            padding: 1.25rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(20px);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-icon {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            box-shadow: 0 0 30px rgba(168, 85, 247, 0.4);
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(34, 197, 94, 0.15);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            color: #22c55e;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #22c55e;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
+            50% { opacity: 0.8; box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); }
+        }
+
+        /* Navigation */
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1.5rem 2rem;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 0.5rem;
+            background: rgba(24, 24, 27, 0.6);
+            padding: 0.375rem;
+            border-radius: 12px;
+            border: 1px solid rgba(168, 85, 247, 0.15);
+            width: fit-content;
+        }
+
+        .nav-tab {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            background: transparent;
+            color: #a1a1aa;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .nav-tab:hover {
+            color: #e4e4e7;
+            background: rgba(168, 85, 247, 0.1);
+        }
+
+        .nav-tab.active {
+            background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4);
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem 3rem;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Cards */
+        .card {
+            background: rgba(24, 24, 27, 0.8);
+            border: 1px solid rgba(168, 85, 247, 0.15);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.2) 0%, rgba(236, 72, 153, 0.2) 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.125rem;
+        }
+
+        .card-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #fafafa;
+        }
+
+        /* Grid Layouts */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+        }
+
+        @media (max-width: 1024px) {
+            .grid-2, .grid-3, .grid-4 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #a1a1aa;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-input, .form-textarea, .form-select {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(168, 85, 247, 0.2);
+            border-radius: 10px;
+            color: #fafafa;
+            font-size: 0.9rem;
+            font-family: inherit;
+            transition: all 0.2s ease;
+        }
+
+        .form-input:focus, .form-textarea:focus, .form-select:focus {
+            outline: none;
+            border-color: #a855f7;
+            box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.15);
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .form-select {
+            cursor: pointer;
+        }
+
+        .form-select option {
+            background: #18181b;
+            color: #fafafa;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.875rem 1.75rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+            color: white;
+            box-shadow: 0 4px 20px rgba(168, 85, 247, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(168, 85, 247, 0.5);
+        }
+
+        .btn-secondary {
+            background: rgba(168, 85, 247, 0.15);
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            color: #a855f7;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(168, 85, 247, 0.25);
+        }
+
+        /* Results */
+        .result-box {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(168, 85, 247, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1.25rem;
+        }
+
+        .result-safe {
+            border-color: rgba(34, 197, 94, 0.4);
+            background: rgba(34, 197, 94, 0.1);
+        }
+
+        .result-danger {
+            border-color: rgba(239, 68, 68, 0.4);
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .result-warning {
+            border-color: rgba(251, 191, 36, 0.4);
+            background: rgba(251, 191, 36, 0.1);
+        }
+
+        .result-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .result-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .result-icon.safe {
+            background: rgba(34, 197, 94, 0.2);
+        }
+
+        .result-icon.danger {
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        .result-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .result-title.safe { color: #22c55e; }
+        .result-title.danger { color: #ef4444; }
+        .result-title.warning { color: #fbbf24; }
+
+        /* Stats Grid */
+        .stat-card {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(168, 85, 247, 0.15);
+            border-radius: 12px;
+            padding: 1.25rem;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #71717a;
+            margin-top: 0.25rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Chart Container */
+        .chart-container {
+            position: relative;
+            height: 280px;
+            margin-top: 1rem;
+        }
+
+        /* Table */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(168, 85, 247, 0.1);
+        }
+
+        .data-table th {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #71717a;
+            font-weight: 600;
+        }
+
+        .data-table tr:hover td {
+            background: rgba(168, 85, 247, 0.05);
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .tag-spam {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .tag-normal {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+        }
+
+        .tag-attack {
+            background: rgba(251, 191, 36, 0.2);
+            color: #fbbf24;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            margin-top: 1rem;
+        }
+
+        .progress-item {
+            margin-bottom: 1rem;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: rgba(168, 85, 247, 0.1);
+            border-radius: 9999px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #a855f7 0%, #ec4899 100%);
+            border-radius: 9999px;
+            transition: width 0.5s ease;
+        }
+
+        /* Loading */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 2rem;
+            color: #a1a1aa;
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(168, 85, 247, 0.2);
+            border-top-color: #a855f7;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Metrics Cards */
+        .metric-card {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.1) 0%, rgba(236, 72, 153, 0.1) 100%);
+            border: 1px solid rgba(168, 85, 247, 0.2);
+            border-radius: 16px;
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, rgba(168, 85, 247, 0.15) 0%, transparent 70%);
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #fafafa;
+        }
+
+        .metric-label {
+            font-size: 0.875rem;
+            color: #a1a1aa;
+            margin-top: 0.25rem;
+        }
+
+        .metric-change {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            margin-top: 0.75rem;
+            font-size: 0.8rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+        }
+
+        .metric-change.up {
+            background: rgba(34, 197, 94, 0.15);
+            color: #22c55e;
+        }
+
+        .metric-change.down {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+        }
+
+        /* Feature Details */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .feature-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 1rem;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            font-size: 0.875rem;
+        }
+
+        .feature-name {
+            color: #a1a1aa;
+        }
+
+        .feature-value {
+            color: #fafafa;
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: #52525b;
+            font-size: 0.875rem;
+            border-top: 1px solid rgba(168, 85, 247, 0.1);
+            margin-top: 3rem;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">🛡️</div>
+                <span class="logo-text">SecureShield AI</span>
+            </div>
+            <div class="status-badge">
+                <span class="status-dot"></span>
+                Sistema Activo
+            </div>
+        </div>
+    </header>
+
+    <nav class="nav-container">
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showSection('spam')">Detector Spam</button>
+            <button class="nav-tab" onclick="showSection('intrusion')">Intrusiones</button>
+            <button class="nav-tab" onclick="showSection('metrics')">Métricas</button>
+            <button class="nav-tab" onclick="showSection('dataset')">Dataset</button>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <!-- Spam Detection Section -->
+        <section id="spam-section" class="section active">
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">📧</div>
+                        <h2 class="card-title">Analizar Email</h2>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Contenido del Email</label>
+                        <textarea id="email-content" class="form-textarea" placeholder="Pegue aquí el contenido del email a analizar..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Asunto del Email</label>
+                        <input type="text" id="email-subject" class="form-input" placeholder="Asunto del mensaje">
+                    </div>
+                    <button class="btn btn-primary" onclick="analyzeSpam()">
+                        <span>🔍</span> Analizar Email
+                    </button>
+                    <div id="spam-result"></div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">📊</div>
+                        <h2 class="card-title">Distribución de Detecciones</h2>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="spam-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">📋</div>
+                    <h2 class="card-title">Historial de Análisis</h2>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Hora</th>
+                            <th>Asunto</th>
+                            <th>Clasificación</th>
+                            <th>Confianza</th>
+                        </tr>
+                    </thead>
+                    <tbody id="spam-history">
+                        <tr>
+                            <td>14:32:15</td>
+                            <td>Oferta exclusiva para ti</td>
+                            <td><span class="tag tag-spam">SPAM</span></td>
+                            <td>94.2%</td>
+                        </tr>
+                        <tr>
+                            <td>14:28:03</td>
+                            <td>Reunión de proyecto mañana</td>
+                            <td><span class="tag tag-normal">Normal</span></td>
+                            <td>98.7%</td>
+                        </tr>
+                        <tr>
+                            <td>14:15:47</td>
+                            <td>Gana dinero rápido!</td>
+                            <td><span class="tag tag-spam">SPAM</span></td>
+                            <td>99.1%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Intrusion Detection Section -->
+        <section id="intrusion-section" class="section">
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">🌐</div>
+                        <h2 class="card-title">Analizar Tráfico de Red</h2>
+                    </div>
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label class="form-label">IP Origen</label>
+                            <input type="text" id="src-ip" class="form-input" placeholder="192.168.1.100">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">IP Destino</label>
+                            <input type="text" id="dst-ip" class="form-input" placeholder="10.0.0.1">
+                        </div>
+                    </div>
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label class="form-label">Puerto Origen</label>
+                            <input type="number" id="src-port" class="form-input" placeholder="54321">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Puerto Destino</label>
+                            <input type="number" id="dst-port" class="form-input" placeholder="80">
+                        </div>
+                    </div>
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label class="form-label">Protocolo</label>
+                            <select id="protocol" class="form-select">
+                                <option value="TCP">TCP</option>
+                                <option value="UDP">UDP</option>
+                                <option value="ICMP">ICMP</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Tamaño Paquete (bytes)</label>
+                            <input type="number" id="packet-size" class="form-input" placeholder="1500">
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="analyzeIntrusion()">
+                        <span>🔒</span> Analizar Tráfico
+                    </button>
+                    <div id="intrusion-result"></div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">📈</div>
+                        <h2 class="card-title">Tráfico por Protocolo</h2>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="intrusion-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">⚠️</div>
+                    <h2 class="card-title">Alertas Recientes</h2>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Hora</th>
+                            <th>IP Origen</th>
+                            <th>Tipo de Ataque</th>
+                            <th>Severidad</th>
+                        </tr>
+                    </thead>
+                    <tbody id="intrusion-history">
+                        <tr>
+                            <td>14:45:23</td>
+                            <td>203.0.113.42</td>
+                            <td><span class="tag tag-attack">Port Scan</span></td>
+                            <td style="color: #fbbf24;">Media</td>
+                        </tr>
+                        <tr>
+                            <td>14:32:11</td>
+                            <td>198.51.100.23</td>
+                            <td><span class="tag tag-spam">DDoS</span></td>
+                            <td style="color: #ef4444;">Alta</td>
+                        </tr>
+                        <tr>
+                            <td>14:21:05</td>
+                            <td>192.0.2.156</td>
+                            <td><span class="tag tag-attack">SQL Injection</span></td>
+                            <td style="color: #ef4444;">Crítica</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Metrics Section -->
+        <section id="metrics-section" class="section">
+            <div class="grid-4">
+                <div class="metric-card">
+                    <div class="metric-value">12,847</div>
+                    <div class="metric-label">Emails Analizados</div>
+                    <div class="metric-change up">↑ 12.5% esta semana</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">2,341</div>
+                    <div class="metric-label">Spam Detectado</div>
+                    <div class="metric-change down">↓ 3.2% esta semana</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">8,923</div>
+                    <div class="metric-label">Conexiones Monitoreadas</div>
+                    <div class="metric-change up">↑ 8.7% esta semana</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">156</div>
+                    <div class="metric-label">Amenazas Bloqueadas</div>
+                    <div class="metric-change up">↑ 23.1% esta semana</div>
+                </div>
+            </div>
+
+            <div class="grid-2" style="margin-top: 1.5rem;">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">🎯</div>
+                        <h2 class="card-title">Rendimiento del Modelo</h2>
+                    </div>
+                    <div class="progress-container">
+                        <div class="progress-item">
+                            <div class="progress-header">
+                                <span>Precisión General</span>
+                                <span style="color: #a855f7;">97.3%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 97.3%"></div>
+                            </div>
+                        </div>
+                        <div class="progress-item">
+                            <div class="progress-header">
+                                <span>Recall (Sensibilidad)</span>
+                                <span style="color: #a855f7;">94.8%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 94.8%"></div>
+                            </div>
+                        </div>
+                        <div class="progress-item">
+                            <div class="progress-header">
+                                <span>F1-Score</span>
+                                <span style="color: #a855f7;">96.0%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 96%"></div>
+                            </div>
+                        </div>
+                        <div class="progress-item">
+                            <div class="progress-header">
+                                <span>Especificidad</span>
+                                <span style="color: #a855f7;">98.2%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 98.2%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">📉</div>
+                        <h2 class="card-title">Actividad Semanal</h2>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="weekly-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dataset Section -->
+        <section id="dataset-section" class="section">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">🗃️</div>
+                    <h2 class="card-title">Explorar Dataset de Entrenamiento</h2>
+                </div>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label class="form-label">Tipo de Datos</label>
+                        <select id="dataset-type" class="form-select" onchange="updateDatasetView()">
+                            <option value="spam">Emails (Spam/Ham)</option>
+                            <option value="network">Tráfico de Red</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Filtrar por</label>
+                        <select id="dataset-filter" class="form-select">
+                            <option value="all">Todos</option>
+                            <option value="positive">Solo Positivos</option>
+                            <option value="negative">Solo Negativos</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn btn-secondary" onclick="loadDataset()" style="margin-bottom: 1rem;">
+                    <span>🔄</span> Cargar Muestra
+                </button>
+                <div id="dataset-content">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Contenido</th>
+                                <th>Etiqueta</th>
+                                <th>Características</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dataset-table">
+                            <tr>
+                                <td>#0001</td>
+                                <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis;">Congratulations! You've won a free iPhone...</td>
+                                <td><span class="tag tag-spam">SPAM</span></td>
+                                <td>Enlaces: 3, Mayúsculas: 45%</td>
+                            </tr>
+                            <tr>
+                                <td>#0002</td>
+                                <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis;">Hi John, here are the meeting notes from today...</td>
+                                <td><span class="tag tag-normal">HAM</span></td>
+                                <td>Enlaces: 0, Mayúsculas: 5%</td>
+                            </tr>
+                            <tr>
+                                <td>#0003</td>
+                                <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis;">URGENT: Your account will be suspended...</td>
+                                <td><span class="tag tag-spam">SPAM</span></td>
+                                <td>Enlaces: 2, Mayúsculas: 67%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">📊</div>
+                        <h2 class="card-title">Distribución del Dataset</h2>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="dataset-chart"></canvas>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">🔬</div>
+                        <h2 class="card-title">Estadísticas del Dataset</h2>
+                    </div>
+                    <div class="grid-2" style="margin-top: 1rem;">
+                        <div class="stat-card">
+                            <div class="stat-value">45,832</div>
+                            <div class="stat-label">Total Muestras</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">23</div>
+                            <div class="stat-label">Características</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">82%</div>
+                            <div class="stat-label">Train Split</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">18%</div>
+                            <div class="stat-label">Test Split</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p>SecureShield AI - Sistema de Detección Inteligente v2.0</p>
+    </footer>
+
+    <script>
+        // Navigation
+        function showSection(section) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            
+            document.getElementById(section + '-section').classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Spam Analysis
+        function analyzeSpam() {
+            const content = document.getElementById('email-content').value;
+            const subject = document.getElementById('email-subject').value;
+            const resultDiv = document.getElementById('spam-result');
+
+            if (!content) {
+                resultDiv.innerHTML = `
+                    <div class="result-box result-warning">
+                        <div class="result-header">
+                            <div class="result-icon" style="background: rgba(251, 191, 36, 0.2);">⚠️</div>
+                            <div>
+                                <div class="result-title warning">Campos Requeridos</div>
+                                <p style="color: #a1a1aa; margin-top: 0.25rem;">Por favor ingrese el contenido del email.</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            resultDiv.innerHTML = `
+                <div class="result-box" style="text-align: center;">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <span>Analizando contenido...</span>
+                    </div>
+                </div>
+            `;
+
+            setTimeout(() => {
+                const spamKeywords = ['gratis', 'ganador', 'premio', 'urgente', 'oferta', 'dinero', 'click', 'suscribete', 'free', 'winner', 'congratulations', 'urgent'];
+                const contentLower = (content + ' ' + subject).toLowerCase();
+                let spamScore = 0;
+                let detectedKeywords = [];
+
+                spamKeywords.forEach(keyword => {
+                    if (contentLower.includes(keyword)) {
+                        spamScore += 15;
+                        detectedKeywords.push(keyword);
+                    }
+                });
+
+                const capsRatio = (content.match(/[A-Z]/g) || []).length / content.length;
+                if (capsRatio > 0.3) spamScore += 20;
+
+                const exclamations = (content.match(/!/g) || []).length;
+                if (exclamations > 3) spamScore += 10;
+
+                const urlPattern = /https?:\/\/[^\s]+/g;
+                const urls = content.match(urlPattern) || [];
+                if (urls.length > 2) spamScore += 15;
+
+                spamScore = Math.min(spamScore, 100);
+                const isSpam = spamScore > 50;
+                const confidence = isSpam ? spamScore : (100 - spamScore);
+
+                resultDiv.innerHTML = `
+                    <div class="result-box ${isSpam ? 'result-danger' : 'result-safe'}">
+                        <div class="result-header">
+                            <div class="result-icon ${isSpam ? 'danger' : 'safe'}">${isSpam ? '🚫' : '✅'}</div>
+                            <div>
+                                <div class="result-title ${isSpam ? 'danger' : 'safe'}">${isSpam ? 'SPAM Detectado' : 'Email Legítimo'}</div>
+                                <p style="color: #a1a1aa; margin-top: 0.25rem;">Confianza: ${confidence.toFixed(1)}%</p>
+                            </div>
+                        </div>
+                        <div class="feature-grid">
+                            <div class="feature-item">
+                                <span class="feature-name">Palabras clave spam</span>
+                                <span class="feature-value">${detectedKeywords.length}</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-name">Ratio mayúsculas</span>
+                                <span class="feature-value">${(capsRatio * 100).toFixed(1)}%</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-name">Enlaces detectados</span>
+                                <span class="feature-value">${urls.length}</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-name">Exclamaciones</span>
+                                <span class="feature-value">${exclamations}</span>
+                            </div>
+                        </div>
+                        ${detectedKeywords.length > 0 ? `<p style="margin-top: 1rem; color: #71717a; font-size: 0.875rem;">Palabras detectadas: ${detectedKeywords.join(', ')}</p>` : ''}
+                    </div>
+                `;
+
+                // Update history
+                const historyTable = document.getElementById('spam-history');
+                const newRow = document.createElement('tr');
+                const now = new Date();
+                newRow.innerHTML = `
+                    <td>${now.toLocaleTimeString()}</td>
+                    <td>${subject || 'Sin asunto'}</td>
+                    <td><span class="tag ${isSpam ? 'tag-spam' : 'tag-normal'}">${isSpam ? 'SPAM' : 'Normal'}</span></td>
+                    <td>${confidence.toFixed(1)}%</td>
+                `;
+                historyTable.insertBefore(newRow, historyTable.firstChild);
+
+                updateSpamChart(isSpam);
+            }, 1500);
+        }
+
+        // Intrusion Analysis
+        function analyzeIntrusion() {
+            const srcIp = document.getElementById('src-ip').value;
+            const dstIp = document.getElementById('dst-ip').value;
+            const srcPort = document.getElementById('src-port').value;
+            const dstPort = document.getElementById('dst-port').value;
+            const protocol = document.getElementById('protocol').value;
+            const packetSize = document.getElementById('packet-size').value;
+            const resultDiv = document.getElementById('intrusion-result');
+
+            if (!srcIp || !dstIp) {
+                resultDiv.innerHTML = `
+                    <div class="result-box result-warning">
+                        <div class="result-header">
+                            <div class="result-icon" style="background: rgba(251, 191, 36, 0.2);">⚠️</div>
+                            <div>
+                                <div class="result-title warning">Campos Requeridos</div>
+                                <p style="color: #a1a1aa; margin-top: 0.25rem;">Por favor complete las direcciones IP.</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            resultDiv.innerHTML = `
+                <div class="result-box" style="text-align: center;">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <span>Analizando tráfico...</span>
+                    </div>
+                </div>
+            `;
+
+            setTimeout(() => {
+                let threatScore = 0;
+                let threats = [];
+
+                const suspiciousPorts = [22, 23, 3389, 445, 1433, 3306];
+                if (suspiciousPorts.includes(parseInt(dstPort))) {
+                    threatScore += 30;
+                    threats.push('Puerto sensible detectado');
+                }
+
+                if (parseInt(packetSize) > 5000) {
+                    threatScore += 20;
+                    threats.push('Tamaño de paquete inusual');
+                }
+
+                if (srcIp.startsWith('10.') || srcIp.startsWith('192.168.')) {
+                    threatScore -= 10;
+                } else {
+                    threatScore += 15;
+                    threats.push('IP externa');
+                }
+
+                threatScore += Math.random() * 20;
+                threatScore = Math.max(0, Math.min(threatScore, 100));
+
+                const isThreat = threatScore > 50;
+                const attackTypes = ['Port Scan', 'DDoS', 'SQL Injection', 'Brute Force', 'Man-in-the-Middle'];
+                const detectedAttack = isThreat ? attackTypes[Math.floor(Math.random() * attackTypes.length)] : null;
+
+                resultDiv.innerHTML = `
+                    <div class="result-box ${isThreat ? 'result-danger' : 'result-safe'}">
+                        <div class="result-header">
+                            <div class="result-icon ${isThreat ? 'danger' : 'safe'}">${isThreat ? '🚨' : '✅'}</div>
+                            <div>
+                                <div class="result-title ${isThreat ? 'danger' : 'safe'}">${isThreat ? 'Amenaza Detectada' : 'Tráfico Normal'}</div>
+                                <p style="color: #a1a1aa; margin-top: 0.25rem;">${isThreat ? `Tipo: ${detectedAttack}` : 'Sin actividad sospechosa'}</p>
+                            </div>
+                        </div>
+                        <div class="feature-grid">
+                            <div class="feature-item">
+                                <span class="feature-name">IP Origen</span>
+                                <span class="feature-value">${srcIp}</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-name">IP Destino</span>
+                                <span class="feature-value">${dstIp}</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-name">Protocolo</span>
+                                <span class="feature-value">${protocol}</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-name">Nivel de riesgo</span>
+                                <span class="feature-value" style="color: ${threatScore > 70 ? '#ef4444' : threatScore > 40 ? '#fbbf24' : '#22c55e'};">${threatScore.toFixed(0)}%</span>
+                            </div>
+                        </div>
+                        ${threats.length > 0 ? `<p style="margin-top: 1rem; color: #71717a; font-size: 0.875rem;">Indicadores: ${threats.join(', ')}</p>` : ''}
+                    </div>
+                `;
+
+                if (isThreat) {
+                    const historyTable = document.getElementById('intrusion-history');
+                    const newRow = document.createElement('tr');
+                    const now = new Date();
+                    newRow.innerHTML = `
+                        <td>${now.toLocaleTimeString()}</td>
+                        <td>${srcIp}</td>
+                        <td><span class="tag tag-attack">${detectedAttack}</span></td>
+                        <td style="color: ${threatScore > 70 ? '#ef4444' : '#fbbf24'};">${threatScore > 70 ? 'Alta' : 'Media'}</td>
+                    `;
+                    historyTable.insertBefore(newRow, historyTable.firstChild);
+                }
+            }, 1500);
+        }
+
+        // Dataset functions
+        function updateDatasetView() {
+            const type = document.getElementById('dataset-type').value;
+            const tableBody = document.getElementById('dataset-table');
+            
+            if (type === 'spam') {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td>#0001</td>
+                        <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis;">Congratulations! You've won a free iPhone...</td>
+                        <td><span class="tag tag-spam">SPAM</span></td>
+                        <td>Enlaces: 3, Mayúsculas: 45%</td>
+                    </tr>
+                    <tr>
+                        <td>#0002</td>
+                        <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis;">Hi John, here are the meeting notes from today...</td>
+                        <td><span class="tag tag-normal">HAM</span></td>
+                        <td>Enlaces: 0, Mayúsculas: 5%</td>
+                    </tr>
+                    <tr>
+                        <td>#0003</td>
+                        <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis;">URGENT: Your account will be suspended...</td>
+                        <td><span class="tag tag-spam">SPAM</span></td>
+                        <td>Enlaces: 2, Mayúsculas: 67%</td>
+                    </tr>
+                `;
+            } else {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td>#N001</td>
+                        <td>TCP 192.168.1.100 → 10.0.0.1:443</td>
+                        <td><span class="tag tag-normal">Normal</span></td>
+                        <td>Bytes: 1500, Duration: 0.5s</td>
+                    </tr>
+                    <tr>
+                        <td>#N002</td>
+                        <td>UDP 203.0.113.50 → 192.168.1.1:53</td>
+                        <td><span class="tag tag-attack">Ataque</span></td>
+                        <td>Bytes: 65000, Duration: 0.01s</td>
+                    </tr>
+                    <tr>
+                        <td>#N003</td>
+                        <td>TCP 198.51.100.23 → 192.168.1.5:22</td>
+                        <td><span class="tag tag-attack">Ataque</span></td>
+                        <td>Bytes: 120, Intentos: 50</td>
+                    </tr>
+                `;
+            }
+        }
+
+        function loadDataset() {
+            const tableBody = document.getElementById('dataset-table');
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="4">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            <span>Cargando datos...</span>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            
+            setTimeout(() => {
+                updateDatasetView();
+            }, 1000);
+        }
+
+        // Charts
+        let spamChart, intrusionChart, weeklyChart, datasetChart;
+        let spamData = { spam: 2341, normal: 10506 };
+
+        function initCharts() {
+            // Spam Chart - Radar style
+            const spamCtx = document.getElementById('spam-chart').getContext('2d');
+            spamChart = new Chart(spamCtx, {
+                type: 'polarArea',
+                data: {
+                    labels: ['SPAM', 'Normal', 'Sospechoso', 'Verificado'],
+                    datasets: [{
+                        data: [2341, 10506, 456, 1544],
+                        backgroundColor: [
+                            'rgba(239, 68, 68, 0.7)',
+                            'rgba(168, 85, 247, 0.7)',
+                            'rgba(251, 191, 36, 0.7)',
+                            'rgba(34, 197, 94, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(239, 68, 68, 1)',
+                            'rgba(168, 85, 247, 1)',
+                            'rgba(251, 191, 36, 1)',
+                            'rgba(34, 197, 94, 1)'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { color: '#a1a1aa', padding: 15, font: { size: 12 } }
+                        }
+                    },
+                    scales: {
+                        r: {
+                            grid: { color: 'rgba(168, 85, 247, 0.1)' },
+                            ticks: { display: false }
+                        }
+                    }
+                }
+            });
+
+            // Intrusion Chart - Horizontal Bar
+            const intrusionCtx = document.getElementById('intrusion-chart').getContext('2d');
+            intrusionChart = new Chart(intrusionCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['TCP', 'UDP', 'ICMP', 'HTTP', 'HTTPS', 'SSH'],
+                    datasets: [{
+                        label: 'Conexiones',
+                        data: [4520, 1890, 340, 2100, 3200, 890],
+                        backgroundColor: 'rgba(168, 85, 247, 0.6)',
+                        borderColor: 'rgba(168, 85, 247, 1)',
+                        borderWidth: 2,
+                        borderRadius: 8,
+                        borderSkipped: false
+                    }, {
+                        label: 'Amenazas',
+                        data: [45, 89, 12, 23, 8, 34],
+                        backgroundColor: 'rgba(236, 72, 153, 0.6)',
+                        borderColor: 'rgba(236, 72, 153, 1)',
+                        borderWidth: 2,
+                        borderRadius: 8,
+                        borderSkipped: false
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: { color: '#a1a1aa', padding: 15, font: { size: 11 } }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: 'rgba(168, 85, 247, 0.1)' },
+                            ticks: { color: '#71717a' }
+                        },
+                        y: {
+                            grid: { display: false },
+                            ticks: { color: '#a1a1aa' }
+                        }
+                    }
+                }
+            });
+
+            // Weekly Chart - Line with fill
+            const weeklyCtx = document.getElementById('weekly-chart').getContext('2d');
+            weeklyChart = new Chart(weeklyCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
+                    datasets: [{
+                        label: 'Emails',
+                        data: [1850, 2100, 1920, 2300, 2150, 980, 750],
+                        borderColor: '#a855f7',
+                        backgroundColor: 'rgba(168, 85, 247, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#a855f7',
+                        pointBorderColor: '#000',
+                        pointBorderWidth: 2,
+                        pointRadius: 5
+                    }, {
+                        label: 'Amenazas',
+                        data: [23, 45, 32, 67, 54, 12, 8],
+                        borderColor: '#ec4899',
+                        backgroundColor: 'rgba(236, 72, 153, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#ec4899',
+                        pointBorderColor: '#000',
+                        pointBorderWidth: 2,
+                        pointRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: { color: '#a1a1aa', padding: 15, font: { size: 11 } }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: 'rgba(168, 85, 247, 0.1)' },
+                            ticks: { color: '#71717a' }
+                        },
+                        y: {
+                            grid: { color: 'rgba(168, 85, 247, 0.1)' },
+                            ticks: { color: '#71717a' }
+                        }
+                    }
+                }
+            });
+
+            // Dataset Chart - Doughnut with gradient
+            const datasetCtx = document.getElementById('dataset-chart').getContext('2d');
+            datasetChart = new Chart(datasetCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Training', 'Validation', 'Test'],
+                    datasets: [{
+                        data: [37582, 4583, 3667],
+                        backgroundColor: [
+                            'rgba(168, 85, 247, 0.8)',
+                            'rgba(236, 72, 153, 0.8)',
+                            'rgba(34, 197, 94, 0.8)'
+                        ],
+                        borderColor: '#000',
+                        borderWidth: 3,
+                        hoverOffset: 10
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '65%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { color: '#a1a1aa', padding: 20, font: { size: 12 } }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateSpamChart(isSpam) {
+            if (isSpam) {
+                spamChart.data.datasets[0].data[0]++;
+            } else {
+                spamChart.data.datasets[0].data[1]++;
+            }
+            spamChart.update();
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', initCharts);
+    </script>
+</body>
+</html>
