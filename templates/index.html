@@ -901,26 +901,35 @@
         function initChart() {
             const ctx = document.getElementById('spamChart').getContext('2d');
             spamChart = new Chart(ctx, {
-                type: 'doughnut',
+                type: 'polarArea',
                 data: {
                     labels: ['Ham', 'Spam'],
                     datasets: [{
                         data: [70, 30],
                         backgroundColor: [
-                            'rgba(34, 197, 94, 0.8)',
-                            'rgba(244, 63, 94, 0.8)'
+                            'rgba(34, 197, 94, 0.7)',
+                            'rgba(244, 63, 94, 0.7)'
                         ],
                         borderColor: [
                             'rgba(34, 197, 94, 1)',
                             'rgba(244, 63, 94, 1)'
                         ],
-                        borderWidth: 2,
-                        hoverOffset: 10
+                        borderWidth: 2
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            ticks: {
+                                display: false
+                            },
+                            grid: {
+                                color: 'rgba(168, 85, 247, 0.15)'
+                            }
+                        }
+                    },
                     plugins: {
                         legend: {
                             position: 'bottom',
@@ -934,7 +943,7 @@
                 }
             });
         }
-
+        
         // Switch sections
         function switchSection(section) {
             document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
