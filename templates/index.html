@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CyberGuard - Sistema de Detección</title>
+    <title>CyberGuard - Detección de Spam</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * {
             margin: 0;
@@ -20,7 +21,7 @@
             display: flex;
         }
 
-        /* New sidebar navigation */
+        /* Sidebar navigation */
         .sidebar {
             width: 80px;
             background: linear-gradient(180deg, #0f0517 0%, #1a0a2e 100%);
@@ -88,7 +89,7 @@
             height: 24px;
         }
 
-        /* Main content area */
+        /* Main content */
         .main-wrapper {
             margin-left: 80px;
             flex: 1;
@@ -96,7 +97,6 @@
             min-height: 100vh;
         }
 
-        /* New header style */
         .page-header {
             display: flex;
             justify-content: space-between;
@@ -159,7 +159,7 @@
             display: block;
         }
 
-        /* New bento grid layout */
+        /* Bento grid */
         .bento-grid {
             display: grid;
             grid-template-columns: repeat(12, 1fr);
@@ -234,7 +234,7 @@
             color: #71717a;
         }
 
-        /* Tabs styling */
+        /* Tabs */
         .tabs-modern {
             display: flex;
             gap: 4px;
@@ -289,43 +289,7 @@
             color: #52525b;
         }
 
-        .form-group {
-            margin-bottom: 16px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 6px;
-            color: #a1a1aa;
-            font-weight: 500;
-            font-size: 0.85rem;
-        }
-
-        .form-group input,
-        .form-group select {
-            width: 100%;
-            padding: 12px 14px;
-            border: 1px solid rgba(168, 85, 247, 0.2);
-            border-radius: 10px;
-            font-size: 14px;
-            background: rgba(0, 0, 0, 0.4);
-            color: #e4e4e7;
-            transition: all 0.3s;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus {
-            outline: none;
-            border-color: #a855f7;
-            box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.15);
-        }
-
-        .form-group select option {
-            background: #1a0a2e;
-            color: #e4e4e7;
-        }
-
-        /* New button styles */
+        /* Buttons */
         .btn {
             display: inline-flex;
             align-items: center;
@@ -370,7 +334,7 @@
             box-shadow: 0 8px 25px rgba(236, 72, 153, 0.35);
         }
 
-        /* Result cards redesign */
+        /* Result cards */
         .result-container {
             margin-top: 20px;
             display: none;
@@ -389,16 +353,6 @@
         }
 
         .result-ham {
-            border-left-color: #22c55e;
-            background: linear-gradient(145deg, rgba(34, 197, 94, 0.08) 0%, rgba(15, 5, 23, 0.95) 100%);
-        }
-
-        .result-intrusion {
-            border-left-color: #f43f5e;
-            background: linear-gradient(145deg, rgba(244, 63, 94, 0.08) 0%, rgba(15, 5, 23, 0.95) 100%);
-        }
-
-        .result-normal {
             border-left-color: #22c55e;
             background: linear-gradient(145deg, rgba(34, 197, 94, 0.08) 0%, rgba(15, 5, 23, 0.95) 100%);
         }
@@ -432,13 +386,11 @@
             font-weight: 700;
         }
 
-        .result-spam .result-title,
-        .result-intrusion .result-title {
+        .result-spam .result-title {
             color: #f43f5e;
         }
 
-        .result-ham .result-title,
-        .result-normal .result-title {
+        .result-ham .result-title {
             color: #22c55e;
         }
 
@@ -473,10 +425,10 @@
             letter-spacing: 0.5px;
         }
 
-        /* Stats cards */
+        /* Stats */
         .stats-row {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 16px;
             margin-bottom: 20px;
         }
@@ -576,48 +528,44 @@
             font-size: 0.9rem;
         }
 
-        /* Features grid */
-        .features-compact {
+        /* Info card */
+        .info-card {
+            background: rgba(168, 85, 247, 0.08);
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid rgba(168, 85, 247, 0.15);
+            margin-bottom: 20px;
+        }
+
+        .info-card h4 {
+            color: #c4b5fd;
+            margin-bottom: 12px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .info-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
+            gap: 10px;
         }
 
-        .feature-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px;
+        .info-item {
+            padding: 10px;
             background: rgba(0, 0, 0, 0.3);
             border-radius: 8px;
-            border: 1px solid rgba(168, 85, 247, 0.1);
-        }
-
-        .feature-name {
             font-size: 0.85rem;
             color: #a1a1aa;
         }
 
-        .feature-value input {
-            width: 100px;
-            padding: 8px 10px;
-            border: 1px solid rgba(168, 85, 247, 0.2);
-            border-radius: 6px;
-            font-size: 13px;
-            background: rgba(0, 0, 0, 0.4);
-            color: #e4e4e7;
-            text-align: right;
-        }
-
-        .feature-value input:focus {
-            outline: none;
-            border-color: #a855f7;
+        .info-item strong {
+            color: #c4b5fd;
         }
 
         /* Metrics grid */
         .metrics-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(2, 1fr);
             gap: 12px;
             margin-bottom: 20px;
         }
@@ -684,62 +632,12 @@
             font-size: 0.85rem;
         }
 
-        /* Info cards */
-        .info-card {
-            background: rgba(168, 85, 247, 0.08);
-            padding: 16px;
-            border-radius: 12px;
-            border: 1px solid rgba(168, 85, 247, 0.15);
+        .tab-content {
+            display: none;
         }
 
-        .info-card h4 {
-            color: #c4b5fd;
-            margin-bottom: 12px;
-            font-size: 0.9rem;
-            font-weight: 600;
-        }
-
-        .info-list {
-            list-style: none;
-            padding: 0;
-        }
-
-        .info-list li {
-            padding: 8px 0;
-            color: #a1a1aa;
-            font-size: 0.85rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .info-list li::before {
-            content: '';
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: #a855f7;
-        }
-
-        /* Attack type box */
-        .attack-box {
-            margin-top: 16px;
-            padding: 16px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 10px;
-            border: 1px solid rgba(168, 85, 247, 0.15);
-        }
-
-        .attack-label {
-            font-size: 0.8rem;
-            color: #71717a;
-            margin-bottom: 6px;
-        }
-
-        .attack-type {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: #22c55e;
+        .tab-content.active {
+            display: block;
         }
 
         /* Scrollbar */
@@ -771,698 +669,394 @@
             .result-details {
                 grid-template-columns: repeat(2, 1fr);
             }
-            .metrics-grid {
+            .stats-row {
                 grid-template-columns: repeat(2, 1fr);
             }
         }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <!-- New sidebar navigation with SVG icons -->
+    <!-- Sidebar -->
     <aside class="sidebar">
         <div class="logo-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
         </div>
         <nav class="nav-items">
-            <button class="nav-item active" onclick="switchSection('spam')" title="Spam Email">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-            </button>
-            <button class="nav-item" onclick="switchSection('intrusion')" title="Intrusiones">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+            <button class="nav-item active" onclick="switchSection('spam')" title="Análisis de Spam">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="4" width="20" height="16" rx="2"/>
+                    <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+                </svg>
             </button>
             <button class="nav-item" onclick="switchSection('metrics')" title="Métricas">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="m19 9-5 5-4-4-3 3"/></svg>
-            </button>
-            <button class="nav-item" onclick="switchSection('dataset')" title="Dataset">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 3v18h18"/>
+                    <path d="m19 9-5 5-4-4-3 3"/>
+                </svg>
             </button>
         </nav>
     </aside>
 
+    <!-- Main Content -->
     <main class="main-wrapper">
-        <!-- Spam Section -->
-        <div id="spam-section" class="content-section active">
-            <div class="page-header">
-                <div>
-                    <h1 class="page-title">Análisis de Spam</h1>
-                    <p class="page-subtitle">Detecta correos maliciosos con Machine Learning</p>
+        <header class="page-header">
+            <div>
+                <h1 class="page-title">Detección de Spam</h1>
+                <p class="page-subtitle">Sistema basado en Regresión Logística</p>
+            </div>
+            <div class="header-badges">
+                <div class="badge">
+                    <div class="badge-dot"></div>
+                    Modelo Activo
                 </div>
-                <div class="header-badges">
-                    <div class="badge"><div class="badge-dot"></div> Sistema activo</div>
-                    <div class="badge">Modelo: Regresión Logística</div>
+                <div class="badge">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+                    </svg>
+                    TREC07P
                 </div>
             </div>
+        </header>
 
+        <!-- Spam Analysis Section -->
+        <section id="spam-section" class="content-section active">
             <div class="bento-grid">
+                <!-- Analyze Panel -->
                 <div class="bento-card span-7">
                     <div class="card-header">
                         <div class="card-title-group">
                             <div class="card-icon purple">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="11" cy="11" r="8"/>
+                                    <path d="m21 21-4.35-4.35"/>
+                                </svg>
                             </div>
                             <div>
-                                <h3 class="card-title">Analizar Correo</h3>
-                                <p class="card-desc">Ingresa el contenido o sube un archivo</p>
+                                <h2 class="card-title">Analizar Correo</h2>
+                                <p class="card-desc">Ingresa el contenido del email</p>
                             </div>
                         </div>
                     </div>
 
                     <div class="tabs-modern">
-                        <button class="tab-modern active" onclick="switchTab('spam', 'text')">Texto</button>
-                        <button class="tab-modern" onclick="switchTab('spam', 'file')">Archivo</button>
+                        <button class="tab-modern active" onclick="switchTab('text')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px; vertical-align: middle;">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/>
+                            </svg>
+                            Texto
+                        </button>
+                        <button class="tab-modern" onclick="switchTab('file')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px; vertical-align: middle;">
+                                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+                            </svg>
+                            Archivo
+                        </button>
                     </div>
 
-                    <div id="spam-text-tab" style="display: block;">
-                        <textarea id="emailText" placeholder="Pega el contenido del correo electrónico aquí para analizarlo..."></textarea>
+                    <div id="text-tab" class="tab-content active">
+                        <textarea id="emailText" placeholder="Pega el contenido del correo aquí..."></textarea>
                     </div>
 
-                    <div id="spam-file-tab" style="display: none;">
-                        <div class="file-upload" onclick="document.getElementById('spamFileInput').click()">
-                            <input type="file" id="spamFileInput" class="file-input" accept=".txt,.html,.eml">
+                    <div id="file-tab" class="tab-content">
+                        <div class="file-upload" onclick="document.getElementById('fileInput').click()">
+                            <input type="file" id="fileInput" class="file-input" accept=".txt,.html,.eml">
                             <div class="upload-icon">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                    <polyline points="17,8 12,3 7,8"/>
+                                    <line x1="12" y1="3" x2="12" y2="15"/>
+                                </svg>
                             </div>
-                            <p class="upload-label">Haz clic para subir un archivo (.txt, .html, .eml)</p>
+                            <div class="upload-label">Haz clic para subir archivo</div>
                         </div>
-                        <div id="spamFileInfo"></div>
+                        <div id="fileInfo" style="margin-top: 10px;"></div>
                     </div>
 
                     <div style="margin-top: 20px;">
                         <button class="btn" onclick="analyzeEmail()">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"/>
+                                <path d="m21 21-4.35-4.35"/>
+                            </svg>
                             Analizar Correo
                         </button>
-                        <button class="btn btn-secondary" onclick="clearSpamAnalysis()">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                        <button class="btn btn-secondary" onclick="clearAnalysis()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                            </svg>
                             Limpiar
                         </button>
                     </div>
 
-                    <div class="loading" id="spamLoading">
+                    <div class="loading" id="loading">
                         <div class="spinner"></div>
                         <p style="color: #a1a1aa;">Analizando correo...</p>
                     </div>
 
-                    <div class="result-container" id="spamResultContainer">
-                        <div class="result-card" id="spamResultCard">
+                    <div class="result-container" id="resultContainer">
+                        <div class="result-card" id="resultCard">
                             <div class="result-header">
-                                <div class="result-icon" id="spamResultIconBox">
-                                    <svg id="spamResultIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                                <div class="result-icon" id="resultIconWrapper">
+                                    <svg id="resultIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="2" y="4" width="20" height="16" rx="2"/>
+                                        <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+                                    </svg>
                                 </div>
                                 <div>
-                                    <h3 class="result-title" id="spamResultTitle">Resultado</h3>
-                                    <p id="spamResultSubtitle" style="color: #71717a; font-size: 0.9rem;">Modelo: Regresión Logística</p>
+                                    <h3 class="result-title" id="resultTitle">Resultado</h3>
+                                    <p id="resultSubtitle" style="color: #71717a; font-size: 0.85rem;">Modelo: Regresión Logística</p>
                                 </div>
                             </div>
-                            <div class="result-details" id="spamResultDetails"></div>
+                            <div class="result-details" id="resultDetails"></div>
                         </div>
                     </div>
                 </div>
 
+                <!-- Model Info Panel -->
                 <div class="bento-card span-5">
-                    <div class="card-header">
-                        <div class="card-title-group">
-                            <div class="card-icon violet">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
-                            </div>
-                            <div>
-                                <h3 class="card-title">Dataset TREC07P</h3>
-                                <p class="card-desc">Distribución de clases</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="stats-row">
-                        <div class="stat-card">
-                            <div class="stat-number">75,419</div>
-                            <div class="stat-label">Total</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number">52,790</div>
-                            <div class="stat-label">Ham</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number">22,629</div>
-                            <div class="stat-label">Spam</div>
-                        </div>
-                    </div>
-
-                    <!-- Chart type: Radar -->
-                    <div class="chart-container">
-                        <canvas id="spamChart"></canvas>
-                    </div>
-
-                    <div class="info-card" style="margin-top: 16px;">
-                        <h4>Características del Modelo</h4>
-                        <ul class="info-list">
-                            <li>Vectorización TF-IDF (5000 features)</li>
-                            <li>Preprocesamiento: tokenización</li>
-                            <li>Regularización L2</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Intrusion Section -->
-        <div id="intrusion-section" class="content-section">
-            <div class="page-header">
-                <div>
-                    <h1 class="page-title">Detección de Intrusiones</h1>
-                    <p class="page-subtitle">Analiza conexiones de red sospechosas</p>
-                </div>
-                <div class="header-badges">
-                    <div class="badge"><div class="badge-dot"></div> Monitoreo activo</div>
-                    <div class="badge">Modelo: Random Forest</div>
-                </div>
-            </div>
-
-            <div class="bento-grid">
-                <div class="bento-card span-7">
                     <div class="card-header">
                         <div class="card-title-group">
                             <div class="card-icon pink">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <path d="M12 16v-4M12 8h.01"/>
+                                </svg>
                             </div>
                             <div>
-                                <h3 class="card-title">Analizar Conexión</h3>
-                                <p class="card-desc">Ingresa los parámetros de red</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="features-compact" style="margin-bottom: 16px;">
-                        <div class="form-group" style="margin-bottom: 0;">
-                            <label for="protocol_type">Protocolo</label>
-                            <select id="protocol_type">
-                                <option value="tcp">TCP</option>
-                                <option value="udp">UDP</option>
-                                <option value="icmp">ICMP</option>
-                            </select>
-                        </div>
-                        <div class="form-group" style="margin-bottom: 0;">
-                            <label for="service">Servicio</label>
-                            <select id="service">
-                                <option value="http">HTTP</option>
-                                <option value="ftp">FTP</option>
-                                <option value="smtp">SMTP</option>
-                                <option value="ssh">SSH</option>
-                                <option value="telnet">Telnet</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="features-compact">
-                        <div class="feature-item">
-                            <span class="feature-name">Duración (s)</span>
-                            <div class="feature-value"><input type="number" id="duration" value="0" step="0.1"></div>
-                        </div>
-                        <div class="feature-item">
-                            <span class="feature-name">Bytes Origen</span>
-                            <div class="feature-value"><input type="number" id="src_bytes" value="491"></div>
-                        </div>
-                        <div class="feature-item">
-                            <span class="feature-name">Bytes Destino</span>
-                            <div class="feature-value"><input type="number" id="dst_bytes" value="0"></div>
-                        </div>
-                        <div class="feature-item">
-                            <span class="feature-name">Count</span>
-                            <div class="feature-value"><input type="number" id="count" value="1" step="0.1"></div>
-                        </div>
-                        <div class="feature-item">
-                            <span class="feature-name">Srv Count</span>
-                            <div class="feature-value"><input type="number" id="srv_count" value="1" step="0.1"></div>
-                        </div>
-                    </div>
-
-                    <div style="margin-top: 20px;">
-                        <button class="btn btn-pink" onclick="analyzeIntrusion()">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
-                            Analizar Conexión
-                        </button>
-                        <button class="btn btn-secondary" onclick="loadSampleIntrusion()">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
-                            Cargar Ejemplo
-                        </button>
-                    </div>
-
-                    <div class="loading" id="intrusionLoading">
-                        <div class="spinner"></div>
-                        <p style="color: #a1a1aa;">Analizando conexión...</p>
-                    </div>
-
-                    <div class="result-container" id="intrusionResultContainer">
-                        <div class="result-card" id="intrusionResultCard">
-                            <div class="result-header">
-                                <div class="result-icon" id="intrusionResultIconBox">
-                                    <svg id="intrusionResultIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
-                                </div>
-                                <div>
-                                    <h3 class="result-title" id="intrusionResultTitle">Resultado</h3>
-                                    <p id="intrusionResultSubtitle" style="color: #71717a; font-size: 0.9rem;">Modelo: Random Forest</p>
-                                </div>
-                            </div>
-                            <div class="result-details" id="intrusionResultDetails"></div>
-                            <div class="attack-box">
-                                <p class="attack-label">Tipo de Ataque Detectado</p>
-                                <p class="attack-type" id="attackType">Normal</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bento-card span-5">
-                    <div class="card-header">
-                        <div class="card-title-group">
-                            <div class="card-icon violet">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></svg>
-                            </div>
-                            <div>
-                                <h3 class="card-title">Dataset KDD Cup 1999</h3>
-                                <p class="card-desc">Estadísticas del dataset</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="stats-row">
-                        <div class="stat-card">
-                            <div class="stat-number">125,973</div>
-                            <div class="stat-label">Total</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number">75,583</div>
-                            <div class="stat-label">Training</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number">25,195</div>
-                            <div class="stat-label">Test</div>
-                        </div>
-                    </div>
-
-                    <!-- Chart type: Line Area -->
-                    <div class="chart-container">
-                        <canvas id="protocolChart"></canvas>
-                    </div>
-
-                    <div class="info-card" style="margin-top: 16px;">
-                        <h4>Características del Modelo</h4>
-                        <ul class="info-list">
-                            <li>42 características por conexión</li>
-                            <li>Clasificación multiclase</li>
-                            <li>23 tipos de ataque</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Metrics Section -->
-        <div id="metrics-section" class="content-section">
-            <div class="page-header">
-                <div>
-                    <h1 class="page-title">Métricas del Modelo</h1>
-                    <p class="page-subtitle">Rendimiento y precisión de los clasificadores</p>
-                </div>
-            </div>
-
-            <div class="bento-grid">
-                <div class="bento-card span-6">
-                    <div class="card-header">
-                        <div class="card-title-group">
-                            <div class="card-icon purple">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-                            </div>
-                            <div>
-                                <h3 class="card-title">Métricas Spam</h3>
+                                <h2 class="card-title">Información del Modelo</h2>
                                 <p class="card-desc">Regresión Logística</p>
                             </div>
                         </div>
-                        <button class="btn" onclick="loadSpamMetrics()">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>
-                            Actualizar
-                        </button>
                     </div>
 
-                    <div class="loading" id="spamMetricsLoading">
-                        <div class="spinner"></div>
-                        <p style="color: #a1a1aa;">Cargando métricas...</p>
-                    </div>
-
-                    <div id="spamMetricsContent"></div>
-                </div>
-
-                <div class="bento-card span-6">
-                    <div class="card-header">
-                        <div class="card-title-group">
-                            <div class="card-icon pink">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
-                            </div>
-                            <div>
-                                <h3 class="card-title">Métricas Intrusión</h3>
-                                <p class="card-desc">Random Forest</p>
-                            </div>
+                    <div class="info-card">
+                        <h4>Configuración Actual</h4>
+                        <div class="info-grid">
+                            <div class="info-item"><strong>Tipo:</strong> Clasificador lineal</div>
+                            <div class="info-item"><strong>Precisión:</strong> <span id="currentAccuracy">--%</span></div>
+                            <div class="info-item"><strong>Características:</strong> 5000 TF-IDF</div>
+                            <div class="info-item"><strong>Dataset:</strong> TREC07P</div>
                         </div>
-                        <button class="btn btn-pink" onclick="loadIntrusionMetrics()">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>
-                            Actualizar
-                        </button>
                     </div>
 
-                    <div class="loading" id="intrusionMetricsLoading">
-                        <div class="spinner"></div>
-                        <p style="color: #a1a1aa;">Cargando métricas...</p>
+                    <div class="chart-container">
+                        <canvas id="spamChart"></canvas>
                     </div>
-
-                    <div id="intrusionMetricsContent"></div>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <!-- Dataset Section -->
-        <div id="dataset-section" class="content-section">
-            <div class="page-header">
-                <div>
-                    <h1 class="page-title">Dataset KDD Cup 1999</h1>
-                    <p class="page-subtitle">Información detallada del conjunto de datos</p>
-                </div>
-            </div>
-
+        <!-- Metrics Section -->
+        <section id="metrics-section" class="content-section">
             <div class="bento-grid">
-                <div class="bento-card span-8">
+                <div class="bento-card span-12">
                     <div class="card-header">
                         <div class="card-title-group">
                             <div class="card-icon violet">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M3 3v18h18"/>
+                                    <path d="m19 9-5 5-4-4-3 3"/>
+                                </svg>
                             </div>
                             <div>
-                                <h3 class="card-title">Información General</h3>
-                                <p class="card-desc">Características del dataset</p>
+                                <h2 class="card-title">Métricas del Modelo</h2>
+                                <p class="card-desc">Rendimiento del clasificador</p>
                             </div>
                         </div>
+                        <button class="btn btn-pink" onclick="loadMetrics()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/>
+                                <path d="M21 3v5h-5"/>
+                            </svg>
+                            Actualizar
+                        </button>
                     </div>
 
-                    <div class="metrics-grid">
-                        <div class="metric-card">
-                            <div class="metric-value">125,973</div>
-                            <div class="metric-label">Registros</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-value">42</div>
-                            <div class="metric-label">Características</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-value">34</div>
-                            <div class="metric-label">Numéricas</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-value">8</div>
-                            <div class="metric-label">Categóricas</div>
-                        </div>
+                    <div class="loading" id="metricsLoading">
+                        <div class="spinner"></div>
+                        <p style="color: #a1a1aa;">Cargando métricas...</p>
                     </div>
 
-                    <div class="info-card" style="margin-bottom: 16px;">
-                        <h4>Ejemplo de datos</h4>
-                        <div style="background: rgba(0,0,0,0.4); padding: 14px; border-radius: 8px; font-family: monospace; font-size: 12px; overflow-x: auto; color: #c4b5fd; margin-top: 12px;">
-                            0,tcp,ftp_data,SF,491,0.1,0.2,...,normal,20<br>
-                            0,udp,other,SF,146,0,0,...,normal,15<br>
-                            0,tcp,private,S0,0,0,0,...,neptune,19<br>
-                            0,tcp,http,SF,232,8153,0,...,normal,21
-                        </div>
-                    </div>
-
-                    <div class="features-compact">
-                        <div class="info-card">
-                            <h4>duration</h4>
-                            <p style="color: #71717a; font-size: 0.85rem;">Duración de conexión</p>
-                        </div>
-                        <div class="info-card">
-                            <h4>protocol_type</h4>
-                            <p style="color: #71717a; font-size: 0.85rem;">TCP/UDP/ICMP</p>
-                        </div>
-                        <div class="info-card">
-                            <h4>service</h4>
-                            <p style="color: #71717a; font-size: 0.85rem;">Tipo de servicio</p>
-                        </div>
-                        <div class="info-card">
-                            <h4>src_bytes</h4>
-                            <p style="color: #71717a; font-size: 0.85rem;">Bytes origen</p>
-                        </div>
-                        <div class="info-card">
-                            <h4>dst_bytes</h4>
-                            <p style="color: #71717a; font-size: 0.85rem;">Bytes destino</p>
-                        </div>
-                        <div class="info-card">
-                            <h4>flag</h4>
-                            <p style="color: #71717a; font-size: 0.85rem;">Estado conexión</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bento-card span-4">
-                    <div class="card-header">
-                        <div class="card-title-group">
-                            <div class="card-icon purple">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
-                            </div>
-                            <div>
-                                <h3 class="card-title">División</h3>
-                                <p class="card-desc">Train / Val / Test</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Chart type: Doughnut with gradient -->
-                    <div class="chart-container" style="height: 240px;">
-                        <canvas id="datasetSplitChart"></canvas>
-                    </div>
-
-                    <div class="info-card" style="margin-top: 16px;">
-                        <h4>Clases de Ataque</h4>
-                        <ul class="info-list">
-                            <li>DoS (neptune, smurf)</li>
-                            <li>Probe (portsweep, nmap)</li>
-                            <li>R2L (guess_passwd)</li>
-                            <li>U2R (buffer_overflow)</li>
-                        </ul>
-                    </div>
+                    <div id="metricsContent"></div>
                 </div>
             </div>
-        </div>
+        </section>
     </main>
 
     <script>
         // Variables globales
-        let spamChartInstance = null;
-        let protocolChartInstance = null;
-        let datasetSplitChartInstance = null;
+        let currentMetrics = null;
+        let spamChart = null;
         
-        // Inicializar al cargar la página
+        // Cargar métricas al inicio
         document.addEventListener('DOMContentLoaded', function() {
-            initializeCharts();
-            loadSampleData();
+            loadMetrics();
+            initChart();
         });
-        
-        // Cambiar secciones
+
+        // Inicializar gráfica
+        function initChart() {
+            const ctx = document.getElementById('spamChart').getContext('2d');
+            spamChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Ham', 'Spam'],
+                    datasets: [{
+                        data: [70, 30],
+                        backgroundColor: [
+                            'rgba(34, 197, 94, 0.8)',
+                            'rgba(244, 63, 94, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgba(34, 197, 94, 1)',
+                            'rgba(244, 63, 94, 1)'
+                        ],
+                        borderWidth: 2,
+                        hoverOffset: 10
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#a1a1aa',
+                                padding: 20,
+                                font: { size: 12 }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Switch sections
         function switchSection(section) {
-            document.querySelectorAll('.nav-item').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.target.closest('.nav-item').classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            document.querySelectorAll('.content-section').forEach(sec => sec.classList.remove('active'));
             
-            document.querySelectorAll('.content-section').forEach(sec => {
-                sec.classList.remove('active');
-            });
+            event.currentTarget.classList.add('active');
             document.getElementById(`${section}-section`).classList.add('active');
         }
         
-        // Cambiar tabs dentro de secciones
-        function switchTab(section, tabName) {
-            const tabs = event.target.parentElement.querySelectorAll('.tab-modern');
-            tabs.forEach(tab => tab.classList.remove('active'));
-            event.target.classList.add('active');
+        // Manejo de tabs
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-modern').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
             
-            if (section === 'spam') {
-                document.getElementById('spam-text-tab').style.display = tabName === 'text' ? 'block' : 'none';
-                document.getElementById('spam-file-tab').style.display = tabName === 'file' ? 'block' : 'none';
+            event.currentTarget.classList.add('active');
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+        }
+        
+        // Leer archivo
+        function readFile(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => resolve(e.target.result);
+                reader.onerror = reject;
+                reader.readAsText(file);
+            });
+        }
+        
+        // Manejar cambio de archivo
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                document.getElementById('fileInfo').innerHTML = `
+                    <div class="info-card" style="margin: 0;">
+                        <strong>Archivo:</strong> ${file.name}<br>
+                        <strong>Tamaño:</strong> ${(file.size / 1024).toFixed(1)} KB
+                    </div>
+                `;
             }
-        }
-        
-        function initializeCharts() {
-            // Gráfico Spam - Radar Chart
-            const spamCtx = document.getElementById('spamChart').getContext('2d');
-            spamChartInstance = new Chart(spamCtx, {
-                type: 'radar',
-                data: {
-                    labels: ['Precision', 'Recall', 'F1-Score', 'Accuracy', 'Specificity'],
-                    datasets: [{
-                        label: 'Ham',
-                        data: [92, 95, 93, 94, 91],
-                        backgroundColor: 'rgba(34, 197, 94, 0.2)',
-                        borderColor: '#22c55e',
-                        borderWidth: 2,
-                        pointBackgroundColor: '#22c55e'
-                    }, {
-                        label: 'Spam',
-                        data: [88, 82, 85, 94, 96],
-                        backgroundColor: 'rgba(244, 63, 94, 0.2)',
-                        borderColor: '#f43f5e',
-                        borderWidth: 2,
-                        pointBackgroundColor: '#f43f5e'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: { color: '#a1a1aa', padding: 15 }
-                        }
-                    },
-                    scales: {
-                        r: {
-                            grid: { color: 'rgba(168, 85, 247, 0.15)' },
-                            angleLines: { color: 'rgba(168, 85, 247, 0.15)' },
-                            ticks: { color: '#71717a', backdropColor: 'transparent' },
-                            pointLabels: { color: '#a1a1aa' }
-                        }
-                    }
-                }
-            });
-            
-            // Gráfico Protocolos - Line Area Chart
-            const protocolCtx = document.getElementById('protocolChart').getContext('2d');
-            const gradient1 = protocolCtx.createLinearGradient(0, 0, 0, 250);
-            gradient1.addColorStop(0, 'rgba(168, 85, 247, 0.4)');
-            gradient1.addColorStop(1, 'rgba(168, 85, 247, 0)');
-            
-            const gradient2 = protocolCtx.createLinearGradient(0, 0, 0, 250);
-            gradient2.addColorStop(0, 'rgba(236, 72, 153, 0.4)');
-            gradient2.addColorStop(1, 'rgba(236, 72, 153, 0)');
-            
-            protocolChartInstance = new Chart(protocolCtx, {
-                type: 'line',
-                data: {
-                    labels: ['TCP', 'UDP', 'ICMP', 'FTP', 'HTTP', 'SSH'],
-                    datasets: [{
-                        label: 'Normal',
-                        data: [45000, 12000, 5000, 8000, 35000, 3000],
-                        backgroundColor: gradient1,
-                        borderColor: '#a855f7',
-                        borderWidth: 2,
-                        fill: true,
-                        tension: 0.4,
-                        pointRadius: 4,
-                        pointBackgroundColor: '#a855f7'
-                    }, {
-                        label: 'Ataque',
-                        data: [40000, 18000, 5000, 2000, 5000, 1000],
-                        backgroundColor: gradient2,
-                        borderColor: '#ec4899',
-                        borderWidth: 2,
-                        fill: true,
-                        tension: 0.4,
-                        pointRadius: 4,
-                        pointBackgroundColor: '#ec4899'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: { color: '#a1a1aa', padding: 15 }
-                        }
-                    },
-                    scales: {
-                        x: {
-                            grid: { color: 'rgba(168, 85, 247, 0.08)' },
-                            ticks: { color: '#71717a' }
-                        },
-                        y: {
-                            grid: { color: 'rgba(168, 85, 247, 0.08)' },
-                            ticks: { color: '#71717a' }
-                        }
-                    }
-                }
-            });
-            
-            // Gráfico Dataset - Doughnut con animación
-            const datasetCtx = document.getElementById('datasetSplitChart').getContext('2d');
-            datasetSplitChartInstance = new Chart(datasetCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Training (60%)', 'Validation (20%)', 'Test (20%)'],
-                    datasets: [{
-                        data: [75583, 25195, 25195],
-                        backgroundColor: ['#a855f7', '#ec4899', '#8b5cf6'],
-                        borderColor: '#000',
-                        borderWidth: 3,
-                        hoverOffset: 8
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    cutout: '65%',
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: { color: '#a1a1aa', padding: 12, font: { size: 11 } }
-                        }
-                    }
-                }
-            });
-        }
-        
-        // Cargar datos de ejemplo
-        function loadSampleData() {
-            document.getElementById('duration').value = 0;
-            document.getElementById('src_bytes').value = 491;
-            document.getElementById('dst_bytes').value = 0;
-            document.getElementById('count').value = 1;
-            document.getElementById('srv_count').value = 1;
-        }
+        });
         
         // Analizar email
         async function analyzeEmail() {
-            const emailContent = document.getElementById('emailText').value.trim();
+            let emailContent = '';
+            
+            if (document.querySelector('#text-tab').classList.contains('active')) {
+                emailContent = document.getElementById('emailText').value.trim();
+            } else {
+                const fileInput = document.getElementById('fileInput');
+                if (!fileInput.files.length) {
+                    alert('Por favor, selecciona un archivo');
+                    return;
+                }
+                try {
+                    emailContent = await readFile(fileInput.files[0]);
+                } catch (error) {
+                    alert('Error leyendo el archivo');
+                    return;
+                }
+            }
             
             if (!emailContent) {
                 alert('Por favor, ingresa el contenido del correo');
                 return;
             }
             
-            document.getElementById('spamLoading').style.display = 'block';
-            document.getElementById('spamResultContainer').style.display = 'none';
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('resultContainer').style.display = 'none';
             
-            setTimeout(() => {
-                const isSpam = Math.random() > 0.7;
-                showSpamResult(isSpam);
-                document.getElementById('spamLoading').style.display = 'none';
-            }, 1500);
+            try {
+                const response = await fetch('/api/predict/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCsrfToken()
+                    },
+                    body: JSON.stringify({
+                        email: emailContent
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    showResult(data.data);
+                } else {
+                    throw new Error(data.message || 'Error en la predicción');
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
         }
         
-        // Mostrar resultados de spam
-        function showSpamResult(isSpam) {
-            const spamProbability = isSpam ? (Math.random() * 0.3 + 0.7) : (Math.random() * 0.3);
-            const confidence = Math.max(spamProbability, 1 - spamProbability);
-            
-            const resultCard = document.getElementById('spamResultCard');
-            const resultIconBox = document.getElementById('spamResultIconBox');
-            const resultTitle = document.getElementById('spamResultTitle');
-            const resultSubtitle = document.getElementById('spamResultSubtitle');
-            const resultDetails = document.getElementById('spamResultDetails');
+        // Mostrar resultados
+        function showResult(result) {
+            const isSpam = result.is_spam;
+            const resultCard = document.getElementById('resultCard');
+            const resultIconWrapper = document.getElementById('resultIconWrapper');
+            const resultIcon = document.getElementById('resultIcon');
+            const resultTitle = document.getElementById('resultTitle');
+            const resultSubtitle = document.getElementById('resultSubtitle');
+            const resultDetails = document.getElementById('resultDetails');
             
             resultCard.className = `result-card ${isSpam ? 'result-spam' : 'result-ham'}`;
-            resultIconBox.className = `result-icon ${isSpam ? 'danger' : 'success'}`;
-            resultIconBox.innerHTML = isSpam 
-                ? '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/></svg>'
-                : '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>';
+            resultIconWrapper.className = `result-icon ${isSpam ? 'danger' : 'success'}`;
+            
+            if (isSpam) {
+                resultIcon.innerHTML = '<path d="M18 6 6 18M6 6l12 12"/>';
+                resultIcon.style.color = '#f43f5e';
+            } else {
+                resultIcon.innerHTML = '<polyline points="20,6 9,17 4,12"/>';
+                resultIcon.style.color = '#22c55e';
+            }
+            
             resultTitle.textContent = isSpam ? 'CORREO SPAM DETECTADO' : 'CORREO LEGÍTIMO';
-            resultSubtitle.innerHTML = `Confianza: <strong style="color: ${isSpam ? '#f43f5e' : '#22c55e'}">${(confidence * 100).toFixed(1)}%</strong>`;
+            resultSubtitle.innerHTML = `Confianza: <strong>${(result.confidence * 100).toFixed(1)}%</strong>`;
             
             resultDetails.innerHTML = `
                 <div class="detail-card">
@@ -1470,150 +1064,88 @@
                     <div class="detail-label">Clasificación</div>
                 </div>
                 <div class="detail-card">
-                    <div class="detail-value">${(spamProbability * 100).toFixed(1)}%</div>
+                    <div class="detail-value">${(result.spam_probability * 100).toFixed(1)}%</div>
                     <div class="detail-label">Prob. Spam</div>
                 </div>
                 <div class="detail-card">
-                    <div class="detail-value">${((1 - spamProbability) * 100).toFixed(1)}%</div>
+                    <div class="detail-value">${(result.ham_probability * 100).toFixed(1)}%</div>
                     <div class="detail-label">Prob. Ham</div>
                 </div>
                 <div class="detail-card">
-                    <div class="detail-value">${(confidence * 100).toFixed(1)}%</div>
+                    <div class="detail-value">${(result.confidence * 100).toFixed(1)}%</div>
                     <div class="detail-label">Confianza</div>
                 </div>
             `;
             
-            document.getElementById('spamResultContainer').style.display = 'block';
+            // Update chart
+            if (spamChart) {
+                spamChart.data.datasets[0].data = [
+                    (result.ham_probability * 100).toFixed(1),
+                    (result.spam_probability * 100).toFixed(1)
+                ];
+                spamChart.update();
+            }
+            
+            document.getElementById('resultContainer').style.display = 'block';
         }
         
-        // Analizar intrusión
-        async function analyzeIntrusion() {
-            document.getElementById('intrusionLoading').style.display = 'block';
-            document.getElementById('intrusionResultContainer').style.display = 'none';
+        // Cargar métricas
+        async function loadMetrics() {
+            document.getElementById('metricsLoading').style.display = 'block';
+            document.getElementById('metricsContent').innerHTML = '';
             
-            setTimeout(() => {
-                const isIntrusion = Math.random() > 0.6;
-                showIntrusionResult(isIntrusion);
-                document.getElementById('intrusionLoading').style.display = 'none';
-            }, 2000);
-        }
-        
-        // Mostrar resultados de intrusión
-        function showIntrusionResult(isIntrusion) {
-            const intrusionProbability = isIntrusion ? (Math.random() * 0.4 + 0.6) : (Math.random() * 0.4);
-            const confidence = Math.max(intrusionProbability, 1 - intrusionProbability);
-            const attackTypes = ['neptune', 'smurf', 'back', 'teardrop', 'normal'];
-            const detectedAttack = isIntrusion ? attackTypes[Math.floor(Math.random() * 4)] : 'normal';
-            
-            const resultCard = document.getElementById('intrusionResultCard');
-            const resultIconBox = document.getElementById('intrusionResultIconBox');
-            const resultTitle = document.getElementById('intrusionResultTitle');
-            const resultSubtitle = document.getElementById('intrusionResultSubtitle');
-            const resultDetails = document.getElementById('intrusionResultDetails');
-            
-            resultCard.className = `result-card ${isIntrusion ? 'result-intrusion' : 'result-normal'}`;
-            resultIconBox.className = `result-icon ${isIntrusion ? 'danger' : 'success'}`;
-            resultIconBox.innerHTML = isIntrusion 
-                ? '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>'
-                : '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>';
-            resultTitle.textContent = isIntrusion ? 'INTRUSIÓN DETECTADA' : 'CONEXIÓN NORMAL';
-            resultSubtitle.innerHTML = `Confianza: <strong style="color: ${isIntrusion ? '#f43f5e' : '#22c55e'}">${(confidence * 100).toFixed(1)}%</strong>`;
-            
-            resultDetails.innerHTML = `
-                <div class="detail-card">
-                    <div class="detail-value">${isIntrusion ? 'ATAQUE' : 'NORMAL'}</div>
-                    <div class="detail-label">Clasificación</div>
-                </div>
-                <div class="detail-card">
-                    <div class="detail-value">${(intrusionProbability * 100).toFixed(1)}%</div>
-                    <div class="detail-label">Prob. Ataque</div>
-                </div>
-                <div class="detail-card">
-                    <div class="detail-value">${((1 - intrusionProbability) * 100).toFixed(1)}%</div>
-                    <div class="detail-label">Prob. Normal</div>
-                </div>
-                <div class="detail-card">
-                    <div class="detail-value">${(confidence * 100).toFixed(1)}%</div>
-                    <div class="detail-label">Confianza</div>
-                </div>
-            `;
-            
-            document.getElementById('attackType').textContent = detectedAttack.toUpperCase();
-            document.getElementById('attackType').style.color = isIntrusion ? '#f43f5e' : '#22c55e';
-            
-            document.getElementById('intrusionResultContainer').style.display = 'block';
-        }
-        
-        // Cargar ejemplo de intrusión
-        function loadSampleIntrusion() {
-            const examples = [
-                {duration: 0, src_bytes: 491, dst_bytes: 0, count: 1, srv_count: 1, protocol: 'tcp', service: 'ftp'},
-                {duration: 0, src_bytes: 146, dst_bytes: 0, count: 0, srv_count: 0, protocol: 'udp', service: 'http'},
-                {duration: 232, src_bytes: 8153, dst_bytes: 0, count: 1.0, srv_count: 0.03, protocol: 'tcp', service: 'http'}
-            ];
-            
-            const example = examples[Math.floor(Math.random() * examples.length)];
-            
-            document.getElementById('duration').value = example.duration;
-            document.getElementById('src_bytes').value = example.src_bytes;
-            document.getElementById('dst_bytes').value = example.dst_bytes;
-            document.getElementById('count').value = example.count;
-            document.getElementById('srv_count').value = example.srv_count;
-            document.getElementById('protocol_type').value = example.protocol;
-            document.getElementById('service').value = example.service;
-        }
-        
-        // Cargar métricas de spam
-        async function loadSpamMetrics() {
-            document.getElementById('spamMetricsLoading').style.display = 'block';
-            document.getElementById('spamMetricsContent').innerHTML = '';
-            
-            setTimeout(() => {
-                const metrics = {
-                    accuracy: (Math.random() * 10 + 90).toFixed(1),
-                    precision: (Math.random() * 10 + 88).toFixed(1),
-                    recall: (Math.random() * 10 + 85).toFixed(1),
-                    f1_score: (Math.random() * 10 + 86).toFixed(1),
-                    train_size: '52,790',
-                    test_size: '22,629',
-                    confusion_matrix: [[4500, 120], [80, 2300]]
-                };
+            try {
+                const response = await fetch('/api/metrics/');
+                const data = await response.json();
                 
-                displaySpamMetrics(metrics);
-                document.getElementById('spamMetricsLoading').style.display = 'none';
-            }, 1000);
+                if (data.status === 'success') {
+                    currentMetrics = data.metrics;
+                    displayMetrics(data.metrics);
+                    updateModelInfo(data.metrics);
+                } else {
+                    throw new Error(data.message);
+                }
+            } catch (error) {
+                document.getElementById('metricsContent').innerHTML = `
+                    <div class="info-card" style="border-color: rgba(244, 63, 94, 0.3); background: rgba(244, 63, 94, 0.08);">
+                        <strong style="color: #f43f5e;">Error:</strong> <span style="color: #fca5a5;">${error.message}</span>
+                    </div>
+                `;
+            } finally {
+                document.getElementById('metricsLoading').style.display = 'none';
+            }
         }
         
-        // Mostrar métricas de spam
-        function displaySpamMetrics(metrics) {
+        // Mostrar métricas
+        function displayMetrics(metrics) {
             let html = `
+                <div class="stats-row">
+                    <div class="stat-card">
+                        <div class="stat-number">${metrics.accuracy}%</div>
+                        <div class="stat-label">Accuracy</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${metrics.precision}%</div>
+                        <div class="stat-label">Precision</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${metrics.recall}%</div>
+                        <div class="stat-label">Recall</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${metrics.f1_score}%</div>
+                        <div class="stat-label">F1-Score</div>
+                    </div>
+                </div>
+                
                 <div class="metrics-grid">
                     <div class="metric-card">
-                        <div class="metric-value">${metrics.accuracy}%</div>
-                        <div class="metric-label">Accuracy</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-value">${metrics.precision}%</div>
-                        <div class="metric-label">Precision</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-value">${metrics.recall}%</div>
-                        <div class="metric-label">Recall</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-value">${metrics.f1_score}%</div>
-                        <div class="metric-label">F1-Score</div>
-                    </div>
-                </div>
-                
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
-                    <div class="metric-card">
                         <div class="metric-value">${metrics.train_size}</div>
-                        <div class="metric-label">Training Set</div>
+                        <div class="metric-label">Muestras Entrenamiento</div>
                     </div>
                     <div class="metric-card">
                         <div class="metric-value">${metrics.test_size}</div>
-                        <div class="metric-label">Test Set</div>
+                        <div class="metric-label">Muestras Test</div>
                     </div>
                 </div>
             `;
@@ -1627,96 +1159,44 @@
                             <div class="matrix-cell matrix-header"></div>
                             <div class="matrix-cell matrix-header">Pred Ham</div>
                             <div class="matrix-cell matrix-header">Pred Spam</div>
+                            
                             <div class="matrix-cell matrix-header">Real Ham</div>
                             <div class="matrix-cell">${cm[0][0]}</div>
                             <div class="matrix-cell">${cm[0][1]}</div>
+                            
                             <div class="matrix-cell matrix-header">Real Spam</div>
                             <div class="matrix-cell">${cm[1][0]}</div>
                             <div class="matrix-cell">${cm[1][1]}</div>
+                        </div>
+                        <div style="margin-top: 12px; text-align: center; font-size: 0.85rem; color: #71717a;">
+                            TN=${cm[0][0]}, FP=${cm[0][1]}, FN=${cm[1][0]}, TP=${cm[1][1]}
                         </div>
                     </div>
                 `;
             }
             
-            document.getElementById('spamMetricsContent').innerHTML = html;
+            document.getElementById('metricsContent').innerHTML = html;
         }
         
-        // Cargar métricas de intrusiones
-        async function loadIntrusionMetrics() {
-            document.getElementById('intrusionMetricsLoading').style.display = 'block';
-            document.getElementById('intrusionMetricsContent').innerHTML = '';
-            
-            setTimeout(() => {
-                const metrics = {
-                    accuracy: (Math.random() * 1 + 99).toFixed(2),
-                    precision: (Math.random() * 2 + 97).toFixed(2),
-                    recall: (Math.random() * 2 + 96).toFixed(2),
-                    f1_score: (Math.random() * 2 + 96.5).toFixed(2),
-                    train_size: '75,583',
-                    test_size: '25,195'
-                };
-                
-                displayIntrusionMetrics(metrics);
-                document.getElementById('intrusionMetricsLoading').style.display = 'none';
-            }, 1000);
+        // Actualizar información del modelo
+        function updateModelInfo(metrics) {
+            document.getElementById('currentAccuracy').textContent = `${metrics.accuracy}%`;
         }
         
-        // Mostrar métricas de intrusiones
-        function displayIntrusionMetrics(metrics) {
-            let html = `
-                <div class="metrics-grid">
-                    <div class="metric-card">
-                        <div class="metric-value">${metrics.accuracy}%</div>
-                        <div class="metric-label">Accuracy</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-value">${metrics.precision}%</div>
-                        <div class="metric-label">Precision</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-value">${metrics.recall}%</div>
-                        <div class="metric-label">Recall</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-value">${metrics.f1_score}%</div>
-                        <div class="metric-label">F1-Score</div>
-                    </div>
-                </div>
-                
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
-                    <div class="metric-card">
-                        <div class="metric-value">${metrics.train_size}</div>
-                        <div class="metric-label">Training Set</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-value">${metrics.test_size}</div>
-                        <div class="metric-label">Test Set</div>
-                    </div>
-                </div>
-                
-                <div class="info-card">
-                    <h4>Distribución de Ataques</h4>
-                    <ul class="info-list">
-                        <li>DoS: 45% (neptune, smurf, teardrop)</li>
-                        <li>Probe: 25% (portsweep, nmap)</li>
-                        <li>R2L: 20% (guess_passwd, warezclient)</li>
-                        <li>U2R: 10% (buffer_overflow, rootkit)</li>
-                    </ul>
-                </div>
-            `;
-            
-            document.getElementById('intrusionMetricsContent').innerHTML = html;
-        }
-        
-        // Limpiar análisis de spam
-        function clearSpamAnalysis() {
+        // Limpiar análisis
+        function clearAnalysis() {
             document.getElementById('emailText').value = '';
-            document.getElementById('spamFileInput').value = '';
-            document.getElementById('spamFileInfo').innerHTML = '';
-            document.getElementById('spamResultContainer').style.display = 'none';
+            document.getElementById('fileInput').value = '';
+            document.getElementById('fileInfo').innerHTML = '';
+            document.getElementById('resultContainer').style.display = 'none';
+            
+            if (spamChart) {
+                spamChart.data.datasets[0].data = [70, 30];
+                spamChart.update();
+            }
         }
         
-        // Obtener token CSRF (para integración con Django)
+        // Obtener token CSRF
         function getCsrfToken() {
             const name = 'csrftoken';
             let cookieValue = null;
@@ -1735,3 +1215,4 @@
     </script>
 </body>
 </html>
+
